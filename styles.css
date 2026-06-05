@@ -648,6 +648,11 @@ button {
   margin-top: 1rem;
 }
 
+.gallery-panel.reveal,
+.gallery-panel.reveal.is-visible {
+  filter: none;
+}
+
 .gallery-grid {
   display: grid;
   gap: 0.9rem;
