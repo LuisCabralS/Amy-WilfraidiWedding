@@ -389,10 +389,7 @@ function initGalleryLightbox() {
     document.body.style.overflow = "";
   }
 
-  let lastTapAt = 0;
-  let lastTapCard = null;
-
-  galleryRoot.addEventListener("dblclick", (event) => {
+  galleryRoot.addEventListener("click", (event) => {
     const card = event.target.closest(".gallery-card");
 
     if (!card) {
@@ -400,30 +397,6 @@ function initGalleryLightbox() {
     }
 
     openLightbox(card.dataset.full, card.dataset.alt);
-  });
-
-  galleryRoot.addEventListener("click", (event) => {
-    if (!isMobileViewport) {
-      return;
-    }
-
-    const card = event.target.closest(".gallery-card");
-
-    if (!card) {
-      return;
-    }
-
-    const now = Date.now();
-
-    if (lastTapCard === card && now - lastTapAt < 320) {
-      openLightbox(card.dataset.full, card.dataset.alt);
-      lastTapAt = 0;
-      lastTapCard = null;
-      return;
-    }
-
-    lastTapAt = now;
-    lastTapCard = card;
   });
 
   galleryRoot.addEventListener("keydown", (event) => {
