@@ -7,7 +7,7 @@ window.WEDDING_DATA = Object.freeze({
     bride: "Amy Cabral",
     groom: "Wilfraidi Rodriguez",
     namesShort: "Amy & Wilfraidi",
-    initials: "L | W",
+    initials: "A | W",
   },
   hero: {
     eyebrow: "Nuestra boda",
@@ -70,7 +70,7 @@ window.WEDDING_DATA = Object.freeze({
         account: "9606687236",
       },
       {
-        bank: "Banco Qik",
+        bank: "Banco Q",
         holder: "Wilfraidi Johansy Rodriguez Pena",
         account: "1000903201",
       },
