@@ -15,6 +15,107 @@
   --section-width: min(1540px, calc(100% - 2rem));
 }
 
+@keyframes ambientPulse {
+  0%,
+  100% {
+    opacity: 0.24;
+    filter: blur(72px) saturate(1);
+  }
+  50% {
+    opacity: 0.38;
+    filter: blur(82px) saturate(1.08);
+  }
+}
+
+@keyframes ctaPulse {
+  0%,
+  100% {
+    box-shadow: 0 18px 40px rgba(201, 153, 66, 0.22);
+    filter: saturate(1);
+  }
+  50% {
+    box-shadow: 0 18px 50px rgba(217, 182, 117, 0.34);
+    filter: saturate(1.08);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translate3d(-120%, 0, 0) rotate(12deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.08;
+  }
+  100% {
+    transform: translate3d(140%, 0, 0) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes goldTextPulse {
+  0%,
+  100% {
+    color: var(--gold);
+    text-shadow: 0 0 0 rgba(217, 182, 117, 0);
+  }
+  50% {
+    color: #f0d6a0;
+    text-shadow: 0 0 18px rgba(217, 182, 117, 0.18);
+  }
+}
+
+@keyframes mediaDrift {
+  0%,
+  100% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 53% 47%;
+  }
+}
+
+@keyframes photoBreath {
+  0%,
+  100% {
+    transform: scale(1.02);
+    filter: saturate(1) brightness(1);
+  }
+  50% {
+    transform: scale(1.08);
+    filter: saturate(1.05) brightness(1.04);
+  }
+}
+
+@keyframes countdownBreathe {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    border-color: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    transform: translate3d(0, -4px, 0);
+    border-color: rgba(217, 182, 117, 0.18);
+    background: rgba(255, 255, 255, 0.075);
+  }
+}
+
+@keyframes surfaceGlow {
+  0%,
+  100% {
+    box-shadow: var(--shadow);
+  }
+  50% {
+    box-shadow:
+      0 32px 90px rgba(1, 7, 16, 0.56),
+      0 0 0 1px rgba(217, 182, 117, 0.08);
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -36,6 +137,10 @@ body {
     radial-gradient(circle at top left, rgba(217, 182, 117, 0.18), transparent 28%),
     radial-gradient(circle at 85% 12%, rgba(74, 124, 214, 0.16), transparent 24%),
     linear-gradient(180deg, #09121f 0%, #08111d 38%, #091724 100%);
+}
+
+body.is-mobile {
+  --motion-strength: 1.24;
 }
 
 img {
@@ -72,6 +177,8 @@ button {
   border-radius: 999px;
   filter: blur(72px);
   opacity: 0.28;
+  animation: ambientPulse 10s ease-in-out infinite;
+  will-change: transform, filter, opacity;
 }
 
 .orb-a {
@@ -91,8 +198,7 @@ button {
 .topbar,
 .panel,
 .hero-glass,
-.hero-note,
-.mini-card {
+.hero-note {
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   background: var(--glass);
@@ -114,6 +220,7 @@ button {
   border-radius: 999px;
   transform: translate3d(0, var(--topbar-shift, 0px), 0);
   transition: transform 220ms linear;
+  will-change: transform;
 }
 
 .topbar-link {
@@ -133,6 +240,7 @@ button {
 
 .topbar-link--ghost {
   color: var(--gold);
+  animation: goldTextPulse 3.6s ease-in-out infinite;
 }
 
 .page-shell {
@@ -160,7 +268,9 @@ button {
   background-size: cover;
   background-position: center;
   transform: scale(1.04);
+  animation: mediaDrift 18s ease-in-out infinite alternate;
   will-change: transform;
+  backface-visibility: hidden;
 }
 
 .hero-overlay {
@@ -174,6 +284,8 @@ button {
   position: relative;
   z-index: 1;
   border-radius: var(--radius-lg);
+  isolation: isolate;
+  overflow: hidden;
 }
 
 .hero-glass {
@@ -204,6 +316,46 @@ button {
   text-transform: uppercase;
   font-size: 0.72rem;
   color: var(--gold);
+}
+
+.hero-glass::after,
+.hero-note::after,
+.panel::after,
+.story-visual::after,
+.location-stack::after,
+.gallery-card::after {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 48%,
+    transparent 66%
+  );
+  opacity: 0;
+  animation: shimmerSweep 9.5s ease-in-out infinite;
+}
+
+.hero-glass::after {
+  animation-delay: 0.2s;
+}
+
+.hero-note::after {
+  animation-delay: 1.2s;
+}
+
+.story-visual::after {
+  animation-delay: 2s;
+}
+
+.location-stack::after {
+  animation-delay: 2.8s;
+}
+
+.gallery-card::after {
+  animation-delay: 0.6s;
 }
 
 .hero h1,
@@ -282,6 +434,7 @@ button {
   background: linear-gradient(135deg, #f4ddb2 0%, #c99942 100%);
   color: #142033;
   box-shadow: 0 18px 40px rgba(201, 153, 66, 0.22);
+  animation: ctaPulse 2.9s ease-in-out infinite;
 }
 
 .button-secondary {
@@ -324,6 +477,20 @@ button {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.07);
   text-align: center;
+  animation: countdownBreathe 4.8s ease-in-out infinite;
+  backface-visibility: hidden;
+}
+
+.countdown-card:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.countdown-card:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+.countdown-card:nth-child(4) {
+  animation-delay: 0.75s;
 }
 
 .countdown-value {
@@ -362,6 +529,8 @@ button {
   --scroll-shift: 0px;
   --scroll-tilt: 0deg;
   --scroll-scale: 0;
+  position: relative;
+  will-change: transform;
 }
 
 .story-visual img {
@@ -369,6 +538,9 @@ button {
   height: 100%;
   min-height: 22rem;
   object-fit: cover;
+  animation: photoBreath 17s ease-in-out infinite alternate;
+  transform-origin: center;
+  backface-visibility: hidden;
 }
 
 .detail-layout {
@@ -417,6 +589,9 @@ button {
 .panel-location {
   padding: 1.35rem;
   border-radius: var(--radius-lg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
 }
 
 .location-summary {
@@ -441,6 +616,7 @@ button {
   --scroll-shift: 0px;
   --scroll-tilt: 0deg;
   --scroll-scale: 0;
+  will-change: transform;
 }
 
 .location-photo {
@@ -449,6 +625,9 @@ button {
   min-height: 24rem;
   object-fit: cover;
   object-position: center;
+  animation: photoBreath 19s ease-in-out infinite alternate;
+  transform-origin: center;
+  backface-visibility: hidden;
 }
 
 .story-visual,
@@ -462,6 +641,7 @@ button {
   transition:
     transform 220ms linear,
     box-shadow 320ms ease;
+  will-change: transform;
 }
 
 .gallery-panel {
@@ -494,6 +674,9 @@ button {
   transition:
     transform 220ms linear,
     box-shadow 320ms ease;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  animation: surfaceGlow 6.8s ease-in-out infinite;
 }
 
 .gallery-card img {
@@ -502,6 +685,8 @@ button {
   object-fit: cover;
   transform: translate3d(0, var(--image-shift, 0px), 0) scale(var(--image-scale, 1.08));
   transition: transform 220ms linear;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .gallery-card figcaption {
@@ -556,6 +741,10 @@ button {
   font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   color: #fff1cf;
+}
+
+.button:active {
+  transform: scale(0.98);
 }
 
 .lightbox {
@@ -677,6 +866,50 @@ button {
   }
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .orb {
+    animation-duration: 8.6s;
+  }
+
+  .hero-media {
+    animation-duration: 13s;
+  }
+
+  .story-visual img,
+  .location-photo {
+    animation-duration: 12.5s;
+  }
+
+  .countdown-card {
+    animation-duration: 3.6s;
+  }
+
+  .gallery-card {
+    animation-duration: 5.4s;
+  }
+
+  .button-primary {
+    animation-duration: 2.4s;
+  }
+
+  .hero-glass::after,
+  .hero-note::after,
+  .panel::after,
+  .story-visual::after,
+  .location-stack::after,
+  .gallery-card::after {
+    animation-duration: 7.2s;
+    opacity: 0.06;
+  }
+
+  .gallery-card:active {
+    transform:
+      translate3d(0, var(--card-shift, 0px), 0)
+      rotate(var(--card-rotate, 0deg))
+      scale(calc(var(--card-scale, 1) * 0.985));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -691,8 +924,11 @@ button {
 
   .hero-media,
   .button,
+  .countdown-card,
   .story-visual,
+  .story-visual img,
   .location-stack,
+  .location-photo,
   .detail-card,
   .gift-card,
   .gallery-card,
@@ -701,5 +937,15 @@ button {
   .orb-a,
   .orb-b {
     transition: none;
+    animation: none;
+  }
+
+  .hero-glass::after,
+  .hero-note::after,
+  .panel::after,
+  .story-visual::after,
+  .location-stack::after,
+  .gallery-card::after {
+    animation: none;
   }
 }
