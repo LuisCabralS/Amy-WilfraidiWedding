@@ -2,8 +2,13 @@ const data = window.WEDDING_DATA;
 const prefersReducedMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
+const isMobileViewport = window.matchMedia(
+  "(hover: none), (pointer: coarse)"
+).matches;
 
 const queryAll = (selector) => document.querySelectorAll(selector);
+
+document.body.classList.toggle("is-mobile", isMobileViewport);
 
 function fillText(selector, value) {
   queryAll(selector).forEach((node) => {
@@ -230,25 +235,75 @@ function initMotionSystem() {
     ),
   ];
   const rootStyle = document.documentElement.style;
-  let ticking = false;
+  const visibleFloatingItems = new Set();
+  const frameGap = isMobileViewport ? 1000 / 32 : 1000 / 60;
+  const visibilityObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          visibleFloatingItems.add(entry.target);
+        } else {
+          visibleFloatingItems.delete(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0,
+      rootMargin: "24% 0px 24% 0px",
+    }
+  );
+  let rafId = 0;
+  let lastFrameTime = 0;
 
-  function update() {
+  floatingItems.forEach((item) => visibilityObserver.observe(item));
+
+  function getActiveFloatingItems() {
+    if (visibleFloatingItems.size) {
+      return [...visibleFloatingItems];
+    }
+
+    return floatingItems.slice(0, isMobileViewport ? 6 : floatingItems.length);
+  }
+
+  function update(now = 0) {
+    if (now - lastFrameTime < frameGap) {
+      rafId = window.requestAnimationFrame(update);
+      return;
+    }
+
+    lastFrameTime = now;
+
     const scrollTop = window.scrollY;
     const viewportHeight = window.innerHeight;
     const maxScroll =
       document.documentElement.scrollHeight - document.documentElement.clientHeight;
     const pageProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+    const time = now * 0.001;
+    const ambientWave = Math.sin(time * 0.9);
+    const mobileBoost = isMobileViewport ? 1.28 : 1;
+    const activeFloatingItems = getActiveFloatingItems();
 
     parallaxItems.forEach((item) => {
       const factor = Number(item.dataset.parallax || 0.1);
-      item.style.transform = `translate3d(0, ${scrollTop * factor}px, 0) scale(1.06)`;
+      const drift = Math.sin(time * 0.7 + factor * 12) * 10 * mobileBoost;
+      const scale = 1.06 + Math.sin(time * 0.45) * 0.018 * mobileBoost;
+      item.style.transform = `translate3d(0, ${scrollTop * factor + drift}px, 0) scale(${scale})`;
     });
 
-    rootStyle.setProperty("--orb-shift-a", `${pageProgress * 90}px`);
-    rootStyle.setProperty("--orb-shift-b", `${pageProgress * -80}px`);
-    rootStyle.setProperty("--topbar-shift", `${Math.sin(scrollTop * 0.01) * 2.5}px`);
+    rootStyle.setProperty(
+      "--orb-shift-a",
+      `${pageProgress * 90 + Math.sin(time * 0.65) * 18 * mobileBoost}px`
+    );
+    rootStyle.setProperty(
+      "--orb-shift-b",
+      `${pageProgress * -80 + Math.cos(time * 0.6) * 14 * mobileBoost}px`
+    );
+    rootStyle.setProperty(
+      "--topbar-shift",
+      `${Math.sin(scrollTop * 0.01 + time * 0.9) * 3.2 * mobileBoost}px`
+    );
 
-    floatingItems.forEach((item, index) => {
+    activeFloatingItems.forEach((item, index) => {
       const rect = item.getBoundingClientRect();
       const centerOffset =
         (rect.top + rect.height / 2 - viewportHeight / 2) / viewportHeight;
@@ -260,40 +315,54 @@ function initMotionSystem() {
           item.dataset.motionFactor || (item.classList.contains("gallery-card") ? 1.18 : 0.58)
         ) || 1;
       const visibility = Math.max(0, 1 - Math.abs(clamped) * 0.92);
-      const shift = -clamped * 18 * factor;
-      const tilt = direction * clamped * 2.6 * factor;
+      const wave = Math.sin(time * (1 + index * 0.04) + index * 0.75);
+      const shift = (-clamped * 18 + wave * 8 * mobileBoost) * factor;
+      const tilt = direction * (clamped * 2.6 + wave * 0.8 * mobileBoost) * factor;
       const scale = visibility * (item.classList.contains("gallery-card") ? 0.028 : 0.012);
 
       if (item.classList.contains("gallery-card")) {
         item.style.setProperty("--card-shift", `${shift}px`);
         item.style.setProperty("--card-rotate", `${tilt}deg`);
-        item.style.setProperty("--card-scale", `${1 + scale}`);
-        item.style.setProperty("--image-shift", `${-shift * 0.7}px`);
-        item.style.setProperty("--image-scale", `${1.08 + visibility * 0.04}`);
+        item.style.setProperty("--card-scale", `${1 + scale + (wave + 1) * 0.004}`);
+        item.style.setProperty("--image-shift", `${-shift * 0.72}px`);
+        item.style.setProperty(
+          "--image-scale",
+          `${1.08 + visibility * 0.04 + (ambientWave + 1) * 0.008 * mobileBoost}`
+        );
         return;
       }
 
       item.style.setProperty("--scroll-shift", `${shift * 0.42}px`);
       item.style.setProperty("--scroll-tilt", `${tilt * 0.22}deg`);
-      item.style.setProperty("--scroll-scale", scale.toFixed(4));
+      item.style.setProperty(
+        "--scroll-scale",
+        (scale + (wave + 1) * 0.0014 * mobileBoost).toFixed(4)
+      );
       item.style.setProperty("--scroll-blur", `${(1 - visibility) * 1.8}px`);
     });
 
-    ticking = false;
+    rafId = window.requestAnimationFrame(update);
   }
 
-  function requestUpdate() {
-    if (ticking) {
+  function handleVisibility() {
+    if (document.hidden) {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
       return;
     }
 
-    ticking = true;
-    window.requestAnimationFrame(update);
+    if (!rafId) {
+      lastFrameTime = 0;
+      rafId = window.requestAnimationFrame(update);
+    }
   }
 
-  update();
-  window.addEventListener("scroll", requestUpdate, { passive: true });
-  window.addEventListener("resize", requestUpdate);
+  rafId = window.requestAnimationFrame(update);
+  window.addEventListener("resize", handleVisibility);
+  window.addEventListener("orientationchange", handleVisibility);
+  document.addEventListener("visibilitychange", handleVisibility);
 }
 
 function initGalleryLightbox() {
@@ -320,6 +389,9 @@ function initGalleryLightbox() {
     document.body.style.overflow = "";
   }
 
+  let lastTapAt = 0;
+  let lastTapCard = null;
+
   galleryRoot.addEventListener("dblclick", (event) => {
     const card = event.target.closest(".gallery-card");
 
@@ -328,6 +400,30 @@ function initGalleryLightbox() {
     }
 
     openLightbox(card.dataset.full, card.dataset.alt);
+  });
+
+  galleryRoot.addEventListener("click", (event) => {
+    if (!isMobileViewport) {
+      return;
+    }
+
+    const card = event.target.closest(".gallery-card");
+
+    if (!card) {
+      return;
+    }
+
+    const now = Date.now();
+
+    if (lastTapCard === card && now - lastTapAt < 320) {
+      openLightbox(card.dataset.full, card.dataset.alt);
+      lastTapAt = 0;
+      lastTapCard = null;
+      return;
+    }
+
+    lastTapAt = now;
+    lastTapCard = card;
   });
 
   galleryRoot.addEventListener("keydown", (event) => {
