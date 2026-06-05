@@ -70,7 +70,7 @@ window.WEDDING_DATA = Object.freeze({
         account: "9606687236",
       },
       {
-        bank: "Banco Q",
+        bank: "Banco Qik",
         holder: "Wilfraidi Johansy Rodriguez Pena",
         account: "1000903201",
       },
