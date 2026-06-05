@@ -231,7 +231,7 @@ function initMotionSystem() {
   const parallaxItems = [...queryAll("[data-parallax]")];
   const floatingItems = [
     ...queryAll(
-      ".hero-glass, .hero-note, .panel, .gallery-panel, .story-visual, .location-stack, .detail-card, .gift-card, .closing, .gallery-card"
+      ".hero-glass, .hero-note, .panel, .story-visual, .location-stack, .detail-card, .gift-card, .closing, .gallery-card"
     ),
   ];
   const rootStyle = document.documentElement.style;
