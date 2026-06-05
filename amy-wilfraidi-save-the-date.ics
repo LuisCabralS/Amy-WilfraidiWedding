@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OpenAI//Wedding Invitation//ES
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:amy-wilfraidi-wedding@invitation
+DTSTAMP:20260605T000000Z
+DTSTART:20260823T170000
+DTEND:20260823T230000
+SUMMARY:Boda de Amy y Wilfraidi
+LOCATION:Salon Restauracion, Ministerio de Defensa
+DESCRIPTION:Te esperamos para celebrar nuestra boda.
+END:VEVENT
+END:VCALENDAR

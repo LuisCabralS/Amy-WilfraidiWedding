@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Glass Romance</title>
+    <meta
+      name="description"
+      content="Invitacion digital de boda premium con enfoque iOS, mobile-first, elegante y romantica."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Allura&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+
+    <header class="topbar reveal">
+      <button class="topbar-link topbar-button" type="button">
+        Confirmar asistencia
+      </button>
+      <a
+        class="topbar-link topbar-link--ghost"
+        data-save-date-button
+        href="#"
+        download="Amy-Wilfraidi-Save-the-Date.ics"
+        >Guardar la fecha</a
+      >
+    </header>
+
+    <audio data-background-audio preload="auto" loop playsinline hidden></audio>
+
+    <main class="page-shell">
+      <section class="hero">
+        <div class="hero-media" data-hero-image data-parallax="0.14"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-glass reveal">
+          <p class="eyebrow" data-hero-eyebrow></p>
+          <h1 data-couple-names></h1>
+          <p class="hero-quote" data-hero-quote></p>
+          <p class="hero-copy" data-hero-intro></p>
+
+          <div class="hero-meta">
+            <span class="meta-pill" data-hero-date></span>
+          </div>
+
+          <div class="hero-actions">
+            <a
+              class="button button-primary"
+              data-maps-button
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+              >Ver ubicacion</a
+            >
+            <a class="button button-secondary" href="#countdown">Faltan</a>
+          </div>
+        </div>
+
+        <aside class="hero-note reveal">
+          <span class="hero-note-label">Cuando</span>
+          <strong data-event-time></strong>
+          <p data-event-venue></p>
+        </aside>
+      </section>
+
+      <section id="countdown" class="panel reveal">
+        <div class="section-copy">
+          <p class="eyebrow">Cuenta regresiva</p>
+          <h2>La noche se acerca con una calma preciosa</h2>
+        </div>
+        <div class="countdown-grid" data-countdown></div>
+      </section>
+
+      <section class="story-grid">
+        <article class="panel panel-story reveal">
+          <p class="eyebrow">Nuestra historia</p>
+          <h2 data-story-title></h2>
+          <p class="body-copy" data-story-body></p>
+        </article>
+
+        <figure class="story-visual reveal">
+          <img
+            data-story-image
+            src=""
+            alt="Retrato editorial de Amy y Wilfraidi"
+            loading="lazy"
+          />
+        </figure>
+      </section>
+
+      <section class="detail-layout reveal">
+        <div class="section-copy">
+          <p class="eyebrow">Detalles</p>
+          <h2>Todo pensado para vivirlo con serenidad y elegancia</h2>
+        </div>
+
+        <div class="detail-grid">
+          <article class="detail-card">
+            <span class="detail-label">Fecha</span>
+            <strong data-hero-date></strong>
+            <p data-event-note></p>
+          </article>
+
+          <article class="detail-card">
+            <span class="detail-label">Hora</span>
+            <strong data-event-time></strong>
+            <p data-event-mode></p>
+          </article>
+
+          <article class="detail-card">
+            <span class="detail-label">Dress code</span>
+            <strong>Elegancia sobria</strong>
+            <p data-dress-code></p>
+          </article>
+
+          <article class="detail-card detail-card--schedule">
+            <span class="detail-label">Momento</span>
+            <div class="schedule-list" data-schedule></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="location-grid">
+        <article class="panel panel-location reveal">
+          <p class="eyebrow">Ubicacion</p>
+          <h2 data-location-title></h2>
+          <p class="body-copy" data-location-body></p>
+          <div class="location-summary">
+            <strong data-event-venue></strong>
+            <span data-event-time></span>
+          </div>
+          <div class="hero-actions">
+            <a
+              class="button button-primary"
+              data-maps-button
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+              >Abrir Google Maps</a
+            >
+            <a
+              class="button button-secondary"
+              data-save-date-button
+              href="#"
+              download="Amy-Wilfraidi-Save-the-Date.ics"
+              >Guardar la fecha</a
+            >
+          </div>
+        </article>
+
+        <figure class="location-stack reveal">
+          <img
+            class="location-photo"
+            src="decoracion-de-salones-de-boda.jpg"
+            alt="Decoracion del salon de bodas"
+            loading="lazy"
+          />
+        </figure>
+      </section>
+
+      <section class="gallery-panel reveal">
+        <div class="section-copy">
+          <p class="eyebrow">Galeria</p>
+          <h2>Una seleccion de miradas, texturas y recuerdos</h2>
+        </div>
+        <div class="gallery-grid" data-gallery></div>
+      </section>
+
+      <section class="panel reveal">
+        <div class="section-copy">
+          <p class="eyebrow">Regalos</p>
+          <h2 data-gifts-title></h2>
+          <p class="body-copy" data-gifts-intro></p>
+        </div>
+        <div class="gift-grid" data-gifts-accounts></div>
+      </section>
+
+      <section class="closing reveal">
+        <p class="closing-script">Con amor</p>
+        <h2 data-closing-title></h2>
+        <p class="body-copy" data-closing-body></p>
+        <strong class="closing-signoff" data-closing-signoff></strong>
+      </section>
+    </main>
+
+    <div class="lightbox" hidden>
+      <button class="lightbox-close" type="button" aria-label="Cerrar imagen">
+        Cerrar
+      </button>
+      <img class="lightbox-image" src="" alt="" />
+    </div>
+
+    <script src="wedding-data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
