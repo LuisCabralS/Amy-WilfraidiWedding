@@ -321,14 +321,11 @@ function initMotionSystem() {
       const scale = visibility * (item.classList.contains("gallery-card") ? 0.028 : 0.012);
 
       if (item.classList.contains("gallery-card")) {
-        item.style.setProperty("--card-shift", `${shift}px`);
-        item.style.setProperty("--card-rotate", `${tilt}deg`);
-        item.style.setProperty("--card-scale", `${1 + scale + (wave + 1) * 0.004}`);
-        item.style.setProperty("--image-shift", `${-shift * 0.72}px`);
-        item.style.setProperty(
-          "--image-scale",
-          `${1.08 + visibility * 0.04 + (ambientWave + 1) * 0.008 * mobileBoost}`
-        );
+        item.style.setProperty("--card-shift", "0px");
+        item.style.setProperty("--card-rotate", "0deg");
+        item.style.setProperty("--card-scale", "1");
+        item.style.setProperty("--image-shift", "0px");
+        item.style.setProperty("--image-scale", "1");
         return;
       }
 
