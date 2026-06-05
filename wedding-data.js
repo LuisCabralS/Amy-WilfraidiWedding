@@ -7,7 +7,7 @@ window.WEDDING_DATA = Object.freeze({
     bride: "Amy Cabral",
     groom: "Wilfraidi Rodriguez",
     namesShort: "Amy & Wilfraidi",
-    initials: "A | W",
+    initials: "L | W",
   },
   hero: {
     eyebrow: "Nuestra boda",
