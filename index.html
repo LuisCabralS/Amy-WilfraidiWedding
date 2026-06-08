@@ -17,7 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Allura&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260605a" />
+    <link rel="stylesheet" href="styles.css?v=20260608a" />
   </head>
   <body>
     <div class="noise"></div>
@@ -25,7 +25,13 @@
     <div class="orb orb-b"></div>
 
     <header class="topbar reveal">
-      <button class="topbar-link topbar-button" type="button">
+      <button
+        class="topbar-link topbar-button"
+        type="button"
+        data-open-rsvp
+        aria-haspopup="dialog"
+        aria-controls="rsvp-modal"
+      >
         Confirmar asistencia
       </button>
       <a
@@ -161,7 +167,7 @@
         <figure class="location-stack reveal">
           <img
             class="location-photo"
-            src="intro.jpeg"
+            src="decoracion-de-salones-de-boda.jpg"
             alt="Decoracion del salon de bodas"
             loading="lazy"
           />
@@ -193,6 +199,113 @@
       </section>
     </main>
 
+    <div class="rsvp-modal" id="rsvp-modal" data-rsvp-modal hidden>
+      <div class="rsvp-backdrop" data-rsvp-close></div>
+      <section
+        class="rsvp-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rsvp-title"
+      >
+        <button
+          class="rsvp-close"
+          type="button"
+          aria-label="Cerrar confirmacion"
+          data-rsvp-close
+        >
+          Cerrar
+        </button>
+
+        <div class="rsvp-header">
+          <p class="eyebrow">RSVP</p>
+          <h2 id="rsvp-title">Confirma tu asistencia</h2>
+          <p class="rsvp-copy">
+            Escribe tu nombre y apellido para encontrar tu invitacion y
+            registrar tu respuesta.
+          </p>
+        </div>
+
+        <form class="rsvp-search" data-rsvp-search-form>
+          <label class="rsvp-field">
+            <span class="rsvp-label">Nombre y apellido</span>
+            <input
+              class="rsvp-input"
+              type="text"
+              name="guest_name"
+              placeholder="Ejemplo: Francisco Cabral"
+              autocomplete="name"
+              spellcheck="false"
+              data-rsvp-query
+            />
+          </label>
+        </form>
+
+        <div class="rsvp-feedback" data-rsvp-feedback aria-live="polite"></div>
+
+        <div class="rsvp-results" data-rsvp-results></div>
+
+        <section class="rsvp-selection" data-rsvp-selection hidden>
+          <div class="rsvp-selection-head">
+            <div>
+              <p class="rsvp-selection-label">Invitacion encontrada</p>
+              <h3 class="rsvp-selection-name" data-rsvp-selected-name></h3>
+              <p class="rsvp-selection-meta" data-rsvp-selected-meta></p>
+            </div>
+            <span class="rsvp-status-chip" data-rsvp-status-chip>Pendiente</span>
+          </div>
+
+          <div class="rsvp-invitation-card">
+            <p class="rsvp-invitation-copy" data-rsvp-invitation-copy></p>
+            <ul class="rsvp-members" data-rsvp-members></ul>
+          </div>
+
+          <p class="rsvp-existing-state" data-rsvp-existing-state hidden></p>
+
+          <form class="rsvp-form" data-rsvp-form>
+            <fieldset class="rsvp-choice">
+              <legend class="rsvp-label">Respuesta</legend>
+              <label class="rsvp-choice-option">
+                <input type="radio" name="attending" value="yes" data-rsvp-attending />
+                <span>Si, con mucho gusto asistire</span>
+              </label>
+              <label class="rsvp-choice-option">
+                <input type="radio" name="attending" value="no" data-rsvp-attending />
+                <span>No podre asistir</span>
+              </label>
+            </fieldset>
+
+            <label class="rsvp-field" data-rsvp-count-wrap hidden>
+              <span class="rsvp-label">Cantidad de personas que asistiran</span>
+              <select class="rsvp-input rsvp-select" data-rsvp-count></select>
+              <small class="rsvp-help" data-rsvp-count-help></small>
+            </label>
+
+            <label class="rsvp-field">
+              <span class="rsvp-label">Mensaje para los novios (opcional)</span>
+              <textarea
+                class="rsvp-input rsvp-textarea"
+                name="message"
+                rows="4"
+                maxlength="240"
+                placeholder="Nos hara mucha ilusion acompanarles..."
+                data-rsvp-message
+              ></textarea>
+            </label>
+
+            <button class="button button-primary rsvp-submit" type="submit" data-rsvp-submit>
+              Guardar confirmacion
+            </button>
+          </form>
+
+          <div class="rsvp-success" data-rsvp-success hidden>
+            <p class="rsvp-success-script">Gracias</p>
+            <strong class="rsvp-success-title">Tu respuesta fue guardada.</strong>
+            <p class="rsvp-success-copy" data-rsvp-success-copy></p>
+          </div>
+        </section>
+      </section>
+    </div>
+
     <div class="lightbox" hidden>
       <button class="lightbox-close" type="button" aria-label="Cerrar imagen">
         Cerrar
@@ -200,7 +313,9 @@
       <img class="lightbox-image" src="" alt="" />
     </div>
 
-    <script src="wedding-data.js?v=20260605a"></script>
-    <script src="script.js?v=20260605a"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=20260608a"></script>
+    <script src="wedding-data.js?v=20260608a"></script>
+    <script src="script.js?v=20260608a"></script>
   </body>
 </html>
