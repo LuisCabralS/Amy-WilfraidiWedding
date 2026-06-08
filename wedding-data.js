@@ -26,19 +26,19 @@ window.WEDDING_DATA = Object.freeze({
     isoDate: "2026-08-23T17:00:00-04:00",
     weekday: "Domingo",
     timeLabel: "5:00 p. m.",
-    mode: "Ceremonia y recepcion",
-    venue: "Salon Restauracion, Ministerio de Defensa",
+    mode: "Ceremonia y recepción",
+    venue: "Salon Restauración, Ministerio de Defensa",
     mapsUrl: "https://maps.app.goo.gl/zRegFxuPjwc6bF7x5?g_st=ic",
     dressCode:
       "Queremos que cada detalle de este día se vea en armonía. Por eso, agradecemos vestir elegante y formal; evitando los colores blanco, gris, azul oscuro y dorado.",
     note:
-      "Todo sucedera en el mismo lugar para que disfrutes la celebracion con calma y sin traslados adicionales.",
+      "Todo sucedera en el mismo lugar para que disfrutes la celebración con calma y sin traslados adicionales.",
     schedule: [
       {
         time: "5:00 p. m.",
-        title: "Ceremonia y recepcion",
+        title: "Ceremonia y recepción",
         description:
-          "La celebracion comenzara puntual y luego la noche seguira a un ritmo relajado en el mismo espacio.",
+          "La celebración comenzara puntual y luego la noche seguira a un ritmo relajado en el mismo espacio.",
       },
     ],
   },
