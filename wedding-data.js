@@ -83,7 +83,7 @@ window.WEDDING_DATA = Object.freeze({
     signoff: "Amy & Wilfraidi",
   },
   visuals: {
-    variant01Hero: "moonlight-embrace.webp",
+    variant01Hero: "Will&Amy-73.jpg",
     variant01Story: "painting-gaze.webp",
     variant02Hero: "portrait-bw.webp",
     variant02Story: "hands-touch.webp",
