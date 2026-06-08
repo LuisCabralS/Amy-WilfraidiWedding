@@ -30,7 +30,7 @@ window.WEDDING_DATA = Object.freeze({
     venue: "Salon Restauracion, Ministerio de Defensa",
     mapsUrl: "https://maps.app.goo.gl/zRegFxuPjwc6bF7x5?g_st=ic",
     dressCode:
-      "Evitar los colores blanco, gris, azul oscuro y dorado.",
+      "Queremos que cada detalle de este día se vea en armonía. Por eso, agradecemos vestir elegante y formal; evitando los colores blanco, gris, azul oscuro y dorado.",
     note:
       "Todo sucedera en el mismo lugar para que disfrutes la celebracion con calma y sin traslados adicionales.",
     schedule: [
