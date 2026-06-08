@@ -7,6 +7,11 @@ const isMobileViewport = window.matchMedia(
 ).matches;
 
 const queryAll = (selector) => document.querySelectorAll(selector);
+const RSVP_STATUS_LABELS = {
+  pending: "Pendiente",
+  confirmed: "Confirmada",
+  declined: "Declinada",
+};
 
 document.body.classList.toggle("is-mobile", isMobileViewport);
 
@@ -23,6 +28,45 @@ function fillLink(selector, href, label) {
       node.textContent = label;
     }
   });
+}
+
+function normalizeName(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function formatSideLabel(side) {
+  if (side === "amy") {
+    return "Invitacion de Amy";
+  }
+
+  if (side === "wilfraidi") {
+    return "Invitacion de Wilfraidi";
+  }
+
+  return "Invitacion";
+}
+
+function formatGroupName(groupName) {
+  return String(groupName || "")
+    .split("·")[0]
+    .trim();
+}
+
+function formatDateTime(value) {
+  if (!value) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("es-DO", {
+    dateStyle: "long",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
 function initBackgroundAudio() {
@@ -111,10 +155,7 @@ function initCountdown() {
     let remainder = diff;
 
     countdownParts.forEach((part) => {
-      const amount =
-        part.key === "seconds"
-          ? Math.floor(remainder / part.size)
-          : Math.floor(remainder / part.size);
+      const amount = Math.floor(remainder / part.size);
 
       part.value.textContent = String(amount).padStart(2, "0");
       remainder %= part.size;
@@ -287,7 +328,9 @@ function initMotionSystem() {
       const factor = Number(item.dataset.parallax || 0.1);
       const drift = Math.sin(time * 0.7 + factor * 12) * 10 * mobileBoost;
       const scale = 1.06 + Math.sin(time * 0.45) * 0.018 * mobileBoost;
-      item.style.transform = `translate3d(0, ${scrollTop * factor + drift}px, 0) scale(${scale})`;
+      item.style.transform = `translate3d(0, ${
+        scrollTop * factor + drift
+      }px, 0) scale(${scale})`;
     });
 
     rootStyle.setProperty(
@@ -423,6 +466,514 @@ function initGalleryLightbox() {
   });
 }
 
+function createSupabaseClient() {
+  const config = window.SUPABASE_CONFIG || {};
+  const url = String(config.url || "").trim();
+  const anonKey = String(config.anonKey || "").trim();
+
+  if (!window.supabase || typeof window.supabase.createClient !== "function") {
+    return {
+      client: null,
+      errorMessage:
+        "No pudimos cargar Supabase en este momento. Recarga la pagina e intentalo de nuevo.",
+    };
+  }
+
+  if (!url || !anonKey || url.includes("YOUR_") || anonKey.includes("YOUR_")) {
+    return {
+      client: null,
+      errorMessage:
+        "La confirmacion aun no esta configurada. Falta completar el archivo supabase-config.js con tu URL y tu anon key.",
+    };
+  }
+
+  return {
+    client: window.supabase.createClient(url, anonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+      global: {
+        headers: {
+          "x-client-info": "amy-wilfraidi-rsvp",
+        },
+      },
+    }),
+    errorMessage: "",
+  };
+}
+
+function initRsvp() {
+  const modal = document.querySelector("[data-rsvp-modal]");
+  const openButtons = queryAll("[data-open-rsvp]");
+  const closeButtons = queryAll("[data-rsvp-close]");
+  const searchInput = document.querySelector("[data-rsvp-query]");
+  const feedback = document.querySelector("[data-rsvp-feedback]");
+  const resultsRoot = document.querySelector("[data-rsvp-results]");
+  const selectionRoot = document.querySelector("[data-rsvp-selection]");
+  const selectedName = document.querySelector("[data-rsvp-selected-name]");
+  const selectedMeta = document.querySelector("[data-rsvp-selected-meta]");
+  const invitationCopy = document.querySelector("[data-rsvp-invitation-copy]");
+  const membersRoot = document.querySelector("[data-rsvp-members]");
+  const existingState = document.querySelector("[data-rsvp-existing-state]");
+  const statusChip = document.querySelector("[data-rsvp-status-chip]");
+  const form = document.querySelector("[data-rsvp-form]");
+  const attendingOptions = queryAll("[data-rsvp-attending]");
+  const countWrap = document.querySelector("[data-rsvp-count-wrap]");
+  const countSelect = document.querySelector("[data-rsvp-count]");
+  const countHelp = document.querySelector("[data-rsvp-count-help]");
+  const messageInput = document.querySelector("[data-rsvp-message]");
+  const submitButton = document.querySelector("[data-rsvp-submit]");
+  const successBox = document.querySelector("[data-rsvp-success]");
+  const successCopy = document.querySelector("[data-rsvp-success-copy]");
+
+  if (
+    !modal ||
+    !openButtons.length ||
+    !searchInput ||
+    !feedback ||
+    !resultsRoot ||
+    !selectionRoot ||
+    !selectedName ||
+    !selectedMeta ||
+    !invitationCopy ||
+    !membersRoot ||
+    !existingState ||
+    !statusChip ||
+    !form ||
+    !countWrap ||
+    !countSelect ||
+    !countHelp ||
+    !messageInput ||
+    !submitButton ||
+    !successBox ||
+    !successCopy
+  ) {
+    return;
+  }
+
+  const supabaseState = createSupabaseClient();
+  const state = {
+    client: supabaseState.client,
+    configError: supabaseState.errorMessage,
+    searchTimer: 0,
+    searchToken: 0,
+    results: [],
+    selectedId: "",
+    invitation: null,
+    closeTimer: 0,
+    isSaving: false,
+  };
+
+  function setFeedback(message, tone = "info") {
+    feedback.textContent = message || "";
+    feedback.dataset.tone = tone;
+  }
+
+  function resetSuccessState() {
+    successBox.hidden = true;
+    successCopy.textContent = "";
+  }
+
+  function clearResults() {
+    resultsRoot.innerHTML = "";
+  }
+
+  function clearSelection() {
+    state.selectedId = "";
+    state.invitation = null;
+    selectionRoot.hidden = true;
+    existingState.hidden = true;
+    existingState.textContent = "";
+    membersRoot.innerHTML = "";
+    resetSuccessState();
+    form.reset();
+  }
+
+  function openModal() {
+    clearTimeout(state.closeTimer);
+    modal.hidden = false;
+    requestAnimationFrame(() => {
+      modal.classList.add("is-open");
+    });
+    document.body.style.overflow = "hidden";
+    searchInput.focus({ preventScroll: true });
+    clearSelection();
+    clearResults();
+    searchInput.value = "";
+
+    if (state.client) {
+      setFeedback(
+        "Escribe al menos dos letras de tu nombre o apellido para buscar tu invitacion.",
+        "info"
+      );
+    } else {
+      setFeedback(state.configError, "error");
+    }
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    state.closeTimer = window.setTimeout(() => {
+      modal.hidden = true;
+    }, 220);
+    document.body.style.overflow = "";
+  }
+
+  function renderStatusChip(status, attending) {
+    const resolvedStatus =
+      status || (attending === true ? "confirmed" : attending === false ? "declined" : "pending");
+
+    statusChip.dataset.status = resolvedStatus;
+    statusChip.textContent = RSVP_STATUS_LABELS[resolvedStatus] || RSVP_STATUS_LABELS.pending;
+  }
+
+  function renderResults(items) {
+    clearResults();
+
+    items.forEach((item) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "rsvp-result";
+      button.dataset.guestId = item.id;
+
+      if (item.id === state.selectedId) {
+        button.classList.add("is-selected");
+      }
+
+      const head = document.createElement("div");
+      head.className = "rsvp-result-head";
+
+      const textWrap = document.createElement("div");
+      const name = document.createElement("p");
+      name.className = "rsvp-result-name";
+      name.textContent = item.full_name;
+
+      const meta = document.createElement("p");
+      meta.className = "rsvp-result-meta";
+      meta.textContent = `${formatSideLabel(item.side)} · ${formatGroupName(item.group_name)}`;
+
+      textWrap.append(name, meta);
+
+      const chip = document.createElement("span");
+      chip.className = "rsvp-status-chip";
+      const resolvedStatus =
+        item.status ||
+        (item.attending === true ? "confirmed" : item.attending === false ? "declined" : "pending");
+      chip.dataset.status = resolvedStatus;
+      chip.textContent = RSVP_STATUS_LABELS[resolvedStatus] || RSVP_STATUS_LABELS.pending;
+
+      head.append(textWrap, chip);
+      button.append(head);
+      resultsRoot.append(button);
+    });
+  }
+
+  async function searchGuests(rawValue) {
+    const normalizedQuery = normalizeName(rawValue);
+    state.searchToken += 1;
+    const currentToken = state.searchToken;
+    clearSelection();
+
+    if (!state.client) {
+      clearResults();
+      setFeedback(state.configError, "error");
+      return;
+    }
+
+    if (normalizedQuery.length < 2) {
+      clearResults();
+      setFeedback(
+        "Escribe al menos dos letras de tu nombre o apellido para comenzar la busqueda.",
+        "info"
+      );
+      return;
+    }
+
+    setFeedback("Buscando tu invitacion...", "loading");
+
+    const { data: matches, error } = await state.client.rpc("search_guest_matches", {
+      search_term: normalizedQuery,
+    });
+
+    if (currentToken !== state.searchToken) {
+      return;
+    }
+
+    if (error) {
+      clearResults();
+      setFeedback(
+        "No pudimos consultar el listado ahora mismo. Intenta de nuevo en unos segundos.",
+        "error"
+      );
+      return;
+    }
+
+    state.results = matches || [];
+
+    if (!state.results.length) {
+      clearResults();
+      setFeedback(
+        "No encontramos coincidencias exactas. Prueba con otro apellido o con menos palabras.",
+        "info"
+      );
+      return;
+    }
+
+    renderResults(state.results);
+    setFeedback("Selecciona tu nombre o tu grupo para continuar.", "success");
+  }
+
+  function setInvitationFormEnabled(enabled) {
+    [...form.elements].forEach((field) => {
+      field.disabled = !enabled;
+    });
+    submitButton.disabled = !enabled || state.isSaving;
+  }
+
+  function updateCountVisibility() {
+    if (!state.invitation) {
+      countWrap.hidden = true;
+      return;
+    }
+
+    const attendingChoice = form.querySelector('input[name="attending"]:checked');
+    const isAttending = attendingChoice && attendingChoice.value === "yes";
+    const maxSeats = Number(state.invitation.max_companions || 1);
+
+    countWrap.hidden = !isAttending || maxSeats <= 1;
+    countHelp.textContent = `Tu invitacion permite confirmar hasta ${maxSeats} persona(s).`;
+
+    if (!isAttending) {
+      countSelect.value = "0";
+    } else if (maxSeats === 1) {
+      countSelect.value = "1";
+    } else if (!countSelect.value) {
+      countSelect.value = String(Math.min(state.invitation.group_members.length || 1, maxSeats));
+    }
+  }
+
+  function renderInvitation(invitation) {
+    state.invitation = invitation;
+    selectionRoot.hidden = false;
+    selectedName.textContent = invitation.selected_name;
+    selectedMeta.textContent = `${formatSideLabel(invitation.side)} · ${formatGroupName(
+      invitation.group_name
+    )}`;
+    invitationCopy.textContent = `Esta invitacion permite confirmar hasta ${invitation.max_companions} persona(s).`;
+
+    membersRoot.innerHTML = "";
+    invitation.group_members.forEach((member) => {
+      const item = document.createElement("li");
+      item.textContent = member;
+      membersRoot.append(item);
+    });
+
+    renderStatusChip(invitation.status, invitation.attending);
+    resetSuccessState();
+
+    if (invitation.status && invitation.status !== "pending") {
+      existingState.hidden = false;
+      existingState.textContent =
+        invitation.attending === true
+          ? `Ya registramos esta invitacion como confirmada el ${formatDateTime(
+              invitation.confirmed_at
+            )}. Cantidad confirmada: ${invitation.companions_count} persona(s).`
+          : `Ya registramos que esta invitacion no podra acompanarnos. Fecha de respuesta: ${formatDateTime(
+              invitation.confirmed_at
+            )}.`;
+      setInvitationFormEnabled(false);
+      updateCountVisibility();
+      return;
+    }
+
+    existingState.hidden = true;
+    existingState.textContent = "";
+    form.reset();
+
+    const defaultCount = Math.min(
+      invitation.group_members.length || 1,
+      Number(invitation.max_companions || 1)
+    );
+
+    countSelect.innerHTML = "";
+    for (let value = 1; value <= Number(invitation.max_companions || 1); value += 1) {
+      const option = document.createElement("option");
+      option.value = String(value);
+      option.textContent = `${value} persona(s)`;
+      countSelect.append(option);
+    }
+
+    const yesOption = form.querySelector('input[name="attending"][value="yes"]');
+    if (yesOption) {
+      yesOption.checked = true;
+    }
+
+    countSelect.value = String(defaultCount || 1);
+    setInvitationFormEnabled(true);
+    updateCountVisibility();
+  }
+
+  async function fetchInvitation(guestId) {
+    if (!state.client) {
+      return;
+    }
+
+    state.selectedId = guestId;
+    renderResults(state.results);
+    setFeedback("Cargando detalles de tu invitacion...", "loading");
+
+    const { data: responseRows, error } = await state.client.rpc("get_guest_invitation", {
+      p_guest_id: guestId,
+    });
+
+    if (error || !responseRows || !responseRows.length) {
+      clearSelection();
+      setFeedback(
+        "No pudimos leer los detalles de esa invitacion. Vuelve a intentarlo.",
+        "error"
+      );
+      return;
+    }
+
+    const invitation = responseRows[0];
+
+    renderInvitation({
+      ...invitation,
+      group_members: invitation.group_members || [],
+    });
+
+    if (invitation.status === "pending") {
+      setFeedback(
+        "Revisa tu invitacion y registra tu respuesta cuando quieras.",
+        "success"
+      );
+    } else {
+      setFeedback(
+        "Esta invitacion ya tiene una respuesta registrada y no se volvera a duplicar.",
+        "info"
+      );
+    }
+  }
+
+  async function submitRsvp(event) {
+    event.preventDefault();
+
+    if (!state.client || !state.invitation || state.isSaving) {
+      return;
+    }
+
+    const attendingChoice = form.querySelector('input[name="attending"]:checked');
+
+    if (!attendingChoice) {
+      setFeedback("Elige si asistiras o no antes de guardar tu respuesta.", "error");
+      return;
+    }
+
+    const attending = attendingChoice.value === "yes";
+    const maxSeats = Number(state.invitation.max_companions || 1);
+    const companionsCount = attending
+      ? Math.max(1, Math.min(Number(countSelect.value || 1), maxSeats))
+      : 0;
+    const message = messageInput.value.trim();
+
+    state.isSaving = true;
+    submitButton.disabled = true;
+    submitButton.textContent = "Guardando...";
+    setFeedback("Guardando tu confirmacion...", "loading");
+
+    const { data: result, error } = await state.client.rpc("submit_rsvp", {
+      p_guest_id: state.invitation.guest_id,
+      p_attending: attending,
+      p_companions_count: companionsCount,
+      p_message: message,
+    });
+
+    state.isSaving = false;
+    submitButton.disabled = false;
+    submitButton.textContent = "Guardar confirmacion";
+
+    if (error) {
+      setFeedback(
+        "No pudimos guardar tu respuesta. Intenta de nuevo en unos segundos.",
+        "error"
+      );
+      return;
+    }
+
+    if (!result || result.ok === false) {
+      setFeedback(
+        result?.message ||
+          "No pudimos completar la confirmacion porque la invitacion ya fue procesada.",
+        result?.code === "ALREADY_CONFIRMED" ? "info" : "error"
+      );
+
+      if (result?.code === "ALREADY_CONFIRMED") {
+        await fetchInvitation(state.invitation.guest_id);
+      }
+      return;
+    }
+
+    state.results = state.results.map((item) =>
+      item.id === state.invitation.guest_id
+        ? {
+            ...item,
+            status: result.status,
+            attending: result.attending,
+            companions_count: result.companions_count,
+            confirmed_at: result.confirmed_at,
+          }
+        : item
+    );
+
+    renderResults(state.results);
+    renderInvitation({
+      ...state.invitation,
+      status: result.status,
+      attending: result.attending,
+      companions_count: result.companions_count,
+      confirmed_at: result.confirmed_at,
+    });
+
+    successBox.hidden = false;
+    successCopy.textContent = result.message;
+    setFeedback("Tu respuesta fue guardada correctamente.", "success");
+  }
+
+  openButtons.forEach((button) => button.addEventListener("click", openModal));
+  closeButtons.forEach((button) => button.addEventListener("click", closeModal));
+
+  searchInput.addEventListener("input", () => {
+    window.clearTimeout(state.searchTimer);
+    state.searchTimer = window.setTimeout(() => {
+      searchGuests(searchInput.value);
+    }, 260);
+  });
+
+  resultsRoot.addEventListener("click", (event) => {
+    const target = event.target.closest(".rsvp-result");
+
+    if (!target) {
+      return;
+    }
+
+    fetchInvitation(target.dataset.guestId);
+  });
+
+  attendingOptions.forEach((option) => {
+    option.addEventListener("change", updateCountVisibility);
+  });
+
+  form.addEventListener("submit", submitRsvp);
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) {
+      closeModal();
+    }
+  });
+}
+
 function populateContent() {
   document.title = `${data.couple.namesShort} | Glass Romance`;
 
@@ -446,7 +997,9 @@ function populateContent() {
   fillText("[data-closing-body]", data.closing.body);
   fillText("[data-closing-signoff]", data.closing.signoff);
 
-  document.querySelector("[data-hero-image]").style.backgroundImage = `url("${data.visuals.variant01Hero}")`;
+  document.querySelector(
+    "[data-hero-image]"
+  ).style.backgroundImage = `url("${data.visuals.variant01Hero}")`;
   document.querySelector("[data-story-image]").src = data.visuals.variant01Story;
 
   fillLink("[data-maps-button]", data.event.mapsUrl);
@@ -462,3 +1015,4 @@ initReveal();
 initMotionSystem();
 initBackgroundAudio();
 initGalleryLightbox();
+initRsvp();
