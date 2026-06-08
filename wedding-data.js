@@ -49,9 +49,9 @@ window.WEDDING_DATA = Object.freeze({
   },
   music: {
     spotifyUrl:
-      "Bruno Mars - Risk It All [The Romantic].mp3",
+      "Good N.mp3",
     // Reemplaza con una ruta local .mp3 o .m4a si quieres autoplay real.
-    backgroundAudioUrl: "Bruno Mars - Risk It All [The Romantic].mp3",
+    backgroundAudioUrl: "Good N.mp3",
     saveTheDateFile: "amy-wilfraidi-save-the-date.ics",
   },
   gifts: {
