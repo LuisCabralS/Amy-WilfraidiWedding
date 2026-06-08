@@ -14,10 +14,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Allura&display=swap"
+      href="https://api.fontshare.com/v2/css?f[]=boska@500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260608a" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260608b" />
   </head>
   <body>
     <div class="noise"></div>
@@ -74,7 +78,7 @@
 
         <aside class="hero-note reveal">
           <span class="hero-note-label">Cuando</span>
-          <strong data-event-time></strong>
+          <strong class="numeric-light" data-event-time></strong>
           <p data-event-venue></p>
         </aside>
       </section>
@@ -113,13 +117,13 @@
         <div class="detail-grid">
           <article class="detail-card">
             <span class="detail-label">Fecha</span>
-            <strong data-hero-date></strong>
+            <strong class="numeric-light" data-hero-date></strong>
             <p data-event-note></p>
           </article>
 
           <article class="detail-card">
             <span class="detail-label">Hora</span>
-            <strong data-event-time></strong>
+            <strong class="numeric-light" data-event-time></strong>
             <p data-event-mode></p>
           </article>
 
@@ -143,7 +147,7 @@
           <p class="body-copy" data-location-body></p>
           <div class="location-summary">
             <strong data-event-venue></strong>
-            <span data-event-time></span>
+            <span class="numeric-light" data-event-time></span>
           </div>
           <div class="hero-actions">
             <a
@@ -167,7 +171,7 @@
         <figure class="location-stack reveal">
           <img
             class="location-photo"
-            src="intro.jpeg"
+            src="decoracion-de-salones-de-boda.jpg"
             alt="Decoracion del salon de bodas"
             loading="lazy"
           />
@@ -216,7 +220,7 @@
           Cerrar
         </button>
 
-        <div class="rsvp-header">
+        <div class="rsvp-header" data-rsvp-search-stage>
           <p class="eyebrow">RSVP</p>
           <h2 id="rsvp-title">Confirma tu asistencia</h2>
           <p class="rsvp-copy">
@@ -225,7 +229,7 @@
           </p>
         </div>
 
-        <form class="rsvp-search" data-rsvp-search-form>
+        <form class="rsvp-search" data-rsvp-search-form data-rsvp-search-stage>
           <label class="rsvp-field">
             <span class="rsvp-label">Nombre y apellido</span>
             <input
@@ -240,9 +244,14 @@
           </label>
         </form>
 
-        <div class="rsvp-feedback" data-rsvp-feedback aria-live="polite"></div>
+        <div
+          class="rsvp-feedback"
+          data-rsvp-feedback
+          data-rsvp-search-stage
+          aria-live="polite"
+        ></div>
 
-        <div class="rsvp-results" data-rsvp-results></div>
+        <div class="rsvp-results" data-rsvp-results data-rsvp-search-stage></div>
 
         <section class="rsvp-selection" data-rsvp-selection hidden>
           <div class="rsvp-selection-head">
@@ -253,6 +262,10 @@
             </div>
             <span class="rsvp-status-chip" data-rsvp-status-chip>Pendiente</span>
           </div>
+
+          <button class="rsvp-back-button" type="button" data-rsvp-reset-search>
+            Buscar otra invitacion
+          </button>
 
           <div class="rsvp-invitation-card">
             <p class="rsvp-invitation-copy" data-rsvp-invitation-copy></p>
@@ -314,8 +327,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js?v=20260608a"></script>
-    <script src="wedding-data.js?v=20260608a"></script>
-    <script src="script.js?v=20260608a"></script>
+    <script src="supabase-config.js?v=20260608b"></script>
+    <script src="wedding-data.js?v=20260608b"></script>
+    <script src="script.js?v=20260608b"></script>
   </body>
 </html>
