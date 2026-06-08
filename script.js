@@ -508,6 +508,7 @@ function initRsvp() {
   const modal = document.querySelector("[data-rsvp-modal]");
   const openButtons = queryAll("[data-open-rsvp]");
   const closeButtons = queryAll("[data-rsvp-close]");
+  const resetSearchButton = document.querySelector("[data-rsvp-reset-search]");
   const searchInput = document.querySelector("[data-rsvp-query]");
   const feedback = document.querySelector("[data-rsvp-feedback]");
   const resultsRoot = document.querySelector("[data-rsvp-results]");
@@ -531,6 +532,7 @@ function initRsvp() {
   if (
     !modal ||
     !openButtons.length ||
+    !resetSearchButton ||
     !searchInput ||
     !feedback ||
     !resultsRoot ||
@@ -576,6 +578,10 @@ function initRsvp() {
     successCopy.textContent = "";
   }
 
+  function setSelectionMode(isSelectionMode) {
+    modal.classList.toggle("is-selection-mode", isSelectionMode);
+  }
+
   function clearResults() {
     resultsRoot.innerHTML = "";
   }
@@ -584,6 +590,7 @@ function initRsvp() {
     state.selectedId = "";
     state.invitation = null;
     selectionRoot.hidden = true;
+    setSelectionMode(false);
     existingState.hidden = true;
     existingState.textContent = "";
     membersRoot.innerHTML = "";
@@ -757,6 +764,7 @@ function initRsvp() {
   function renderInvitation(invitation) {
     state.invitation = invitation;
     selectionRoot.hidden = false;
+    setSelectionMode(true);
     selectedName.textContent = invitation.selected_name;
     selectedMeta.textContent = `${formatSideLabel(invitation.side)} · ${formatGroupName(
       invitation.group_name
@@ -943,6 +951,14 @@ function initRsvp() {
 
   openButtons.forEach((button) => button.addEventListener("click", openModal));
   closeButtons.forEach((button) => button.addEventListener("click", closeModal));
+  resetSearchButton.addEventListener("click", () => {
+    clearSelection();
+    setFeedback(
+      "Escribe de nuevo el nombre y apellido para buscar otra invitacion.",
+      "info"
+    );
+    searchInput.focus({ preventScroll: true });
+  });
 
   searchInput.addEventListener("input", () => {
     window.clearTimeout(state.searchTimer);
