@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Admin RSVP | Amy & Wilfraidi</title>
+    <meta
+      name="description"
+      content="Panel privado para visualizar las confirmaciones RSVP de la boda."
+    />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=boska@500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="admin-rsvp.css?v=20260610a" />
+  </head>
+  <body>
+    <div class="admin-noise"></div>
+    <div class="admin-orb admin-orb-a"></div>
+    <div class="admin-orb admin-orb-b"></div>
+
+    <main class="admin-shell">
+      <section class="admin-auth-card" data-auth-view>
+        <p class="admin-eyebrow">Panel privado</p>
+        <h1>Admin RSVP</h1>
+        <p class="admin-copy">
+          Inicia sesión con tu cuenta de Supabase para ver confirmaciones,
+          pendientes y respuestas recientes de la boda.
+        </p>
+
+        <form class="admin-login-form" data-login-form>
+          <label class="admin-field">
+            <span>Correo</span>
+            <input
+              class="admin-input"
+              type="email"
+              name="email"
+              autocomplete="email"
+              placeholder="tu-correo@ejemplo.com"
+              required
+            />
+          </label>
+
+          <label class="admin-field">
+            <span>Contraseña</span>
+            <input
+              class="admin-input"
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              placeholder="Tu contraseña"
+              required
+            />
+          </label>
+
+          <button class="admin-button admin-button-primary" type="submit" data-login-submit>
+            Entrar al panel
+          </button>
+        </form>
+
+        <p class="admin-feedback" data-auth-feedback aria-live="polite"></p>
+      </section>
+
+      <section class="admin-app" data-dashboard-view hidden>
+        <header class="admin-topbar">
+          <div>
+            <p class="admin-eyebrow">Panel RSVP</p>
+            <h2>Amy & Wilfraidi</h2>
+            <p class="admin-topbar-copy">
+              Vista privada de confirmaciones en tiempo real.
+            </p>
+          </div>
+
+          <div class="admin-topbar-actions">
+            <div class="admin-user-pill">
+              <span class="admin-user-label">Sesión</span>
+              <strong data-admin-email></strong>
+            </div>
+            <button class="admin-button admin-button-secondary" type="button" data-refresh-dashboard>
+              Actualizar
+            </button>
+            <button class="admin-button admin-button-secondary" type="button" data-sign-out>
+              Cerrar sesión
+            </button>
+          </div>
+        </header>
+
+        <div class="admin-feedback admin-feedback--dashboard" data-dashboard-feedback aria-live="polite"></div>
+
+        <section class="admin-summary-grid" data-summary-grid>
+          <article class="admin-summary-card">
+            <span class="admin-summary-label">Invitaciones</span>
+            <strong class="admin-summary-value" data-summary-total-groups>0</strong>
+            <p class="admin-summary-copy">Grupos o familias cargadas</p>
+          </article>
+
+          <article class="admin-summary-card">
+            <span class="admin-summary-label">Confirmadas</span>
+            <strong class="admin-summary-value" data-summary-confirmed>0</strong>
+            <p class="admin-summary-copy">Invitaciones que ya respondieron sí</p>
+          </article>
+
+          <article class="admin-summary-card">
+            <span class="admin-summary-label">Pendientes</span>
+            <strong class="admin-summary-value" data-summary-pending>0</strong>
+            <p class="admin-summary-copy">Invitaciones sin respuesta aún</p>
+          </article>
+
+          <article class="admin-summary-card">
+            <span class="admin-summary-label">No asistirán</span>
+            <strong class="admin-summary-value" data-summary-declined>0</strong>
+            <p class="admin-summary-copy">Invitaciones que declinaron</p>
+          </article>
+
+          <article class="admin-summary-card">
+            <span class="admin-summary-label">Personas confirmadas</span>
+            <strong class="admin-summary-value" data-summary-seats>0</strong>
+            <p class="admin-summary-copy">Total de lugares reservados</p>
+          </article>
+
+          <article class="admin-summary-card">
+            <span class="admin-summary-label">Invitados cargados</span>
+            <strong class="admin-summary-value" data-summary-total-guests>0</strong>
+            <p class="admin-summary-copy">Personas en todo el listado</p>
+          </article>
+        </section>
+
+        <section class="admin-layout">
+          <aside class="admin-sidebar-card">
+            <div class="admin-filter-block">
+              <label class="admin-field">
+                <span>Buscar por nombre o familia</span>
+                <input
+                  class="admin-input"
+                  type="search"
+                  placeholder="Ejemplo: Cabral, Wilson, Vargas..."
+                  data-filter-search
+                />
+              </label>
+            </div>
+
+            <div class="admin-filter-block">
+              <span class="admin-filter-label">Lado</span>
+              <div class="admin-chip-row">
+                <button class="admin-chip is-active" type="button" data-filter-side="all">
+                  Todos
+                </button>
+                <button class="admin-chip" type="button" data-filter-side="amy">
+                  Amy
+                </button>
+                <button class="admin-chip" type="button" data-filter-side="wilfraidi">
+                  Wilfraidi
+                </button>
+              </div>
+            </div>
+
+            <div class="admin-filter-block">
+              <span class="admin-filter-label">Estado</span>
+              <div class="admin-chip-row">
+                <button class="admin-chip is-active" type="button" data-filter-status="all">
+                  Todos
+                </button>
+                <button class="admin-chip" type="button" data-filter-status="pending">
+                  Pendientes
+                </button>
+                <button class="admin-chip" type="button" data-filter-status="confirmed">
+                  Confirmadas
+                </button>
+                <button class="admin-chip" type="button" data-filter-status="declined">
+                  No asistirán
+                </button>
+              </div>
+            </div>
+
+            <div class="admin-list-head">
+              <div>
+                <p class="admin-list-title">Invitaciones</p>
+                <p class="admin-list-subtitle" data-filter-count>0 resultados</p>
+              </div>
+              <span class="admin-last-update" data-last-updated></span>
+            </div>
+
+            <div class="admin-group-list" data-group-list></div>
+          </aside>
+
+          <section class="admin-detail-column">
+            <article class="admin-detail-card" data-detail-card>
+              <div class="admin-detail-empty" data-detail-empty>
+                Selecciona una invitación para ver miembros, estado, cupo y último movimiento.
+              </div>
+
+              <div class="admin-detail-content" data-detail-content hidden>
+                <div class="admin-detail-head">
+                  <div>
+                    <p class="admin-eyebrow">Detalle</p>
+                    <h3 data-detail-group-name></h3>
+                    <p class="admin-detail-meta" data-detail-meta></p>
+                  </div>
+                  <span class="admin-status-chip" data-detail-status>—</span>
+                </div>
+
+                <div class="admin-detail-stats">
+                  <div class="admin-mini-stat">
+                    <span>Cupo</span>
+                    <strong data-detail-max-companions>0</strong>
+                  </div>
+                  <div class="admin-mini-stat">
+                    <span>Confirmados</span>
+                    <strong data-detail-companions-count>0</strong>
+                  </div>
+                  <div class="admin-mini-stat">
+                    <span>Última respuesta</span>
+                    <strong data-detail-confirmed-at>Sin respuesta</strong>
+                  </div>
+                </div>
+
+                <div class="admin-members-card">
+                  <p class="admin-members-title">Miembros de la invitación</p>
+                  <ul class="admin-members-list" data-detail-members></ul>
+                </div>
+
+                <div class="admin-message-card">
+                  <p class="admin-members-title">Mensaje registrado</p>
+                  <p class="admin-message-copy" data-detail-message>
+                    Esta invitación todavía no ha dejado un mensaje.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="admin-recent-card">
+              <div class="admin-recent-head">
+                <div>
+                  <p class="admin-eyebrow">Actividad</p>
+                  <h3>Respuestas recientes</h3>
+                </div>
+              </div>
+              <div class="admin-recent-list" data-recent-list></div>
+            </article>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=20260610a"></script>
+    <script src="admin-rsvp.js?v=20260610a"></script>
+  </body>
+</html>
