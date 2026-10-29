@@ -26,20 +26,28 @@
   
 <!--Start of Tawk.to Script-->
 <script>
-  window.chatwootSettings = {"position":"right","type":"standard","launcherTitle":""};
-  (function(d,t) {
-    var BASE_URL="https://chat.digecog.gob.do";
-    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=BASE_URL+"/packs/js/sdk.js";
+  window.chatwootSettings = {
+    position: "right",
+    type: "standard",
+    launcherTitle: ""
+  };
+
+  (function (d, t) {
+    var BASE_URL = "https://chat.digecog.gob.do";
+    var g = d.createElement(t);
+    var s = d.getElementsByTagName(t)[0];
+
+    g.src = BASE_URL + "/packs/js/sdk.js";
     g.async = true;
-    s.parentNode.insertBefore(g,s);
-    g.onload=function(){
+    s.parentNode.insertBefore(g, s);
+
+    g.onload = function () {
       window.chatwootSDK.run({
-        websiteToken: 'Sc6RV2gpTtL6FfdaPXn4mBwp',
+        websiteToken: "Sc6RV2gpTtL6FfdaPXn4mBwp",
         baseUrl: BASE_URL
-      })
-    }
-  })(document,"script");
+      });
+    };
+  })(document, "script");
 </script>
 <!--End of Tawk.to Script-->
   
